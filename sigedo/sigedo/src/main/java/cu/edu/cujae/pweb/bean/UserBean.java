@@ -29,16 +29,17 @@ public class UserBean {
 	}
 	
 	public String login() {
-		if(username.equalsIgnoreCase("pweb") && password.equals("pweb")) {
-			try {
-				getFacesContext().getExternalContext().redirect(getRequest().getContextPath() +
-					    "/pages/welcome/welcome.jsf");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			UserAuthenticatedDto userAuthenticated = authService.login(username, password);
+			UserDetails userDetails = UserPrincipal.create(userAuthenticated);
+			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+	               SecurityContextHolder.getContext().setAuthentication(authentication);
+			
+		} catch (Exception e) {
+	             JsfUtils.addMessageFromBundle("securityMessages", FacesMessage.SEVERITY_INFO, "message_invalid_credentials");
+	             return null;
 		}
-		return  null;
+		return "login";
 	}
 	
 	protected HttpServletRequest getRequest() {
