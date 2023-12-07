@@ -1,0 +1,91 @@
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <ui:composition template="/pages/template/layout.xhtml">
+    <ui:define name="title"> Evaluaciones</ui:define>
+    <ui:define name="layout">
+      <h:form id="form">
+        <div class="card crud-demo">
+          <p:toolbar>
+            <p:toolbarGroup>
+              <p:commandButton
+                value="Nuevo"
+                icon="pi pi-plus"
+                actionListener="#{manageEvaluationBean.openNew}"
+                update=":form:manage-student-content"
+                oncomplete="PF('manageEvaluationDialog').show()"
+                styleClass="ui-button-success"
+                style="margin-right: 0.5rem"
+              >
+                <p:resetInput target=":form:eval-content" />
+              </p:commandButton>
+            </p:toolbarGroup>
+          </p:toolbar>
+        <p:dataTable
+            id="dt-evaluations"
+            widgetVar="dtEvals"
+            var="evals"
+            value="#{manageEvaluationBean.evals}"
+            reflow="true"
+            paginator="true"
+            rows="10"
+            paginatorPosition="bottom"
+          >
+
+            <p:column
+              headerText="Asignaturas"
+              sortBy="#{evals.subject}"
+              filterBy="#{evals.subject}"
+            >
+              <h:outputText value="#{evals.subject}" />
+            </p:column>
+            <p:column headerText="Estudiantes" 
+            sortBy="#{evals.student}">
+              <h:outputText value="#{evals.student}" />
+            </p:column>
+            <p:column
+              headerText="Nota"
+              sortBy="#{evals.note}"
+            >
+              <h:outputText value="#{evals.note}" />
+            </p:column>
+
+            <p:column exportable="false">
+              <p:commandButton
+                icon="pi pi-pencil"
+                action="#{manageEvaluationBean.openForEdit}"
+                update=":form:eval-content"
+                oncomplete="PF('manageEvalDialog').show()"
+                styleClass="edit-button rounded-button ui-button-success"
+                process="@this"
+              >
+                <f:setPropertyActionListener
+                  value="#{evals}"
+                  target="#{manageEvaluationBean.selectedEval}"
+                />
+                <p:resetInput target=":form:eval-content" />
+              </p:commandButton>
+              <p:commandButton
+                class="ui-button-warning rounded-button"
+                icon="pi pi-trash"
+                process="@this"
+                action="#{manageEvaluationBean.deleteEvaluation}"
+              >
+                <f:setPropertyActionListener
+                  value="#{evals}"
+                  target="#{manageEvaluationBean.selectedEval}"
+                />
+            </p:column>
+          </p:dataTable>
+
+          <ui:include src="eval-form.xhtml"></ui:include>
+
+        </div>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>
