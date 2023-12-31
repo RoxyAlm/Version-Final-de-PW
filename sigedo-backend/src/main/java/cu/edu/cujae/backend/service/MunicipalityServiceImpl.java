@@ -1,6 +1,7 @@
 package cu.edu.cujae.backend.service;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,39 +25,42 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	public List<MunicipalityDto> getMunicipalities() throws SQLException {
 
 		List<MunicipalityDto> municipalities = new ArrayList<>();
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement()
-				.executeQuery("SELECT * FROM municipalitys");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM municipalitys");
 
-		while (rs.next()) {
-			MunicipalityDto mun = new MunicipalityDto(rs.getString(2), false);
-			mun.setId(String.valueOf(rs.getInt(1)));
-			municipalities.add(mun);
+			while (rs.next()) {
+				MunicipalityDto mun = new MunicipalityDto(rs.getString(2), false);
+				mun.setId(String.valueOf(rs.getInt(1)));
+				municipalities.add(mun);
+			}
+
 		}
 		return municipalities;
 	}
 
 	@Override
-	public MunicipalityDto getMunicipalityById(String id) throws SQLException,NoSuchElementException {
+	public MunicipalityDto getMunicipalityById(String id) throws SQLException, NoSuchElementException {
 		MunicipalityDto m = null;
 		try {
 			m = getMunicipalities().stream().filter(r -> r.getId().equals(id)).findFirst().get();
 		} catch (NoSuchElementException e) {
 			throw new NoSuchElementException("The element was not found");
 		}
-		
+
 		return m;
 
 	}
 
 	@Override
 	public void createMunicipality(MunicipalityDto municipality) throws SQLException {
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call insert_municipality(?)}");
 
-		CS.setString(1, municipality.getNameMunicipality());
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call insert_municipality(?)}");
 
-		CS.executeUpdate();
+			CS.setString(1, municipality.getNameMunicipality());
 
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
@@ -66,15 +70,15 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
-		
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call update_municipality(?, ?)}");
 
-		CS.setInt(1, Integer.valueOf(municipality.getId()));
-		CS.setString(2, municipality.getNameMunicipality());
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call update_municipality(?, ?)}");
 
-		CS.executeUpdate();
+			CS.setInt(1, Integer.valueOf(municipality.getId()));
+			CS.setString(2, municipality.getNameMunicipality());
 
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
@@ -84,14 +88,14 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
-		
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call delete_municipality(?)}");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
 
-		CS.setInt(1, Integer.valueOf(id));
+			CallableStatement CS = conn.prepareCall("{call delete_municipality(?)}");
 
-		CS.executeUpdate();
+			CS.setInt(1, Integer.valueOf(id));
 
+			CS.executeUpdate();
+		}
 	}
 
 }

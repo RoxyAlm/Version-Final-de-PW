@@ -1,4 +1,4 @@
-package cu.edu.cujae.backend.service;
+ package cu.edu.cujae.backend.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,13 +33,15 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void createUser(UserDto user) throws SQLException {
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call insert_usser(?, ?, ?)}");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call insert_usser(?, ?, ?)}");
 
-		CS.setString(1, user.getUsername());
-		CS.setString(2, getMd5Hash(user.getPassword()));
-		CS.setInt(3, Integer.valueOf(user.getRole().getId()));
+			CS.setString(1, user.getUsername());
+			CS.setString(2, getMd5Hash(user.getPassword()));
+			CS.setInt(3, Integer.valueOf(user.getRole().getId()));
 
-		CS.executeUpdate();
+			CS.executeUpdate();
+		}
 
 	}
 
@@ -47,15 +49,15 @@ public class UserServiceImpl implements UserService {
 	public List<UserDto> listUsers() throws SQLException {
 
 		List<UserDto> userList = new ArrayList<UserDto>();
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement()
-				.executeQuery("SELECT * FROM ussers");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM ussers");
 
-		while (rs.next()) {
-			UserDto user = new UserDto(rs.getString(2), rs.getString(3), roleService.getRoleById(rs.getString(1)));
-			user.setId(String.valueOf(rs.getInt(1)));
-			userList.add(user);
+			while (rs.next()) {
+				UserDto user = new UserDto(rs.getString(2), rs.getString(3), roleService.getRoleById(rs.getString(1)));
+				user.setId(String.valueOf(rs.getInt(1)));
+				userList.add(user);
+			}
 		}
-
 		return userList;
 	}
 
@@ -66,17 +68,16 @@ public class UserServiceImpl implements UserService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call update_usser(?, ?, ?, ?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call update_usser(?, ?, ?, ?)}");
+			CS.setInt(1, Integer.valueOf(user.getId()));
+			CS.setString(2, user.getUsername());
+			CS.setString(3, encodePass(user.getPassword()));
+			CS.setInt(4, Integer.valueOf(user.getRole().getId()));
 
-		CS.setInt(1, Integer.valueOf(user.getId()));
-		CS.setString(2, user.getUsername());
-		CS.setString(3, encodePass(user.getPassword()));
-		CS.setInt(4, Integer.valueOf(user.getRole().getId()));
-
-		CS.executeUpdate();
-
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
@@ -100,11 +101,12 @@ public class UserServiceImpl implements UserService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call delete_usser(?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call delete_usser(?)}");
-
-		CS.setInt(1, Integer.valueOf(userId));
-		CS.executeUpdate();
+			CS.setInt(1, Integer.valueOf(userId));
+			CS.executeUpdate();
+		}
 	}
 
 	private String getMd5Hash(String password) {
@@ -134,7 +136,8 @@ public class UserServiceImpl implements UserService {
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				user = new UserDto(rs.getString("username"),rs.getString("password"),roleService.getRoleById(rs.getString("id")));
+				user = new UserDto(rs.getString("usser_name"), rs.getString("password"),
+						roleService.getRoleById(rs.getString("role")));
 			}
 		}
 

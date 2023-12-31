@@ -1,6 +1,7 @@
 package cu.edu.cujae.backend.service;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,23 +36,28 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<RoleDto> getRoles() throws SQLException {
 		List<RoleDto> roleList = new ArrayList<RoleDto>();
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement()
-				.executeQuery("SELECT * FROM roles");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
 
-		while (rs.next()) {
-			RoleDto role = new RoleDto(rs.getString(2));
-			role.setId(String.valueOf(rs.getInt(1)));
-			roleList.add(role);
+			ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM roles");
+
+			while (rs.next()) {
+				RoleDto role = new RoleDto(rs.getString(2));
+				role.setId(String.valueOf(rs.getInt(1)));
+				roleList.add(role);
+			}
 		}
 		return roleList;
 	}
 
 	@Override
 	public void createRole(RoleDto role) throws SQLException {
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call insert_role(?)}");
 
-		CS.setString(1, role.getRoleName());
-		CS.executeUpdate();
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call insert_role(?)}");
+
+			CS.setString(1, role.getRoleName());
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
@@ -61,12 +67,13 @@ public class RoleServiceImpl implements RoleService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call update_role(?, ?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call update_role(?, ?)}");
-
-		CS.setInt(1, Integer.valueOf(role.getId()));
-		CS.setString(2, role.getRoleName());
-		CS.executeUpdate();
+			CS.setInt(1, Integer.valueOf(role.getId()));
+			CS.setString(2, role.getRoleName());
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
@@ -76,11 +83,12 @@ public class RoleServiceImpl implements RoleService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call delete_role(?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call delete_role(?)}");
-
-		CS.setInt(1, Integer.valueOf(id));
-		CS.executeUpdate();
+			CS.setInt(1, Integer.valueOf(id));
+			CS.executeUpdate();
+		}
 	}
 
 }

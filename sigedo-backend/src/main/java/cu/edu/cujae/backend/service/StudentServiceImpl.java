@@ -1,6 +1,7 @@
 package cu.edu.cujae.backend.service;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,9 +33,8 @@ public class StudentServiceImpl implements StudentService {
 		List<MunicipalityDto> municipalities = municipalityService.getMunicipalities();
 		List<GroupDto> groups = groupService.getGroups();
 
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement()
-				.executeQuery("SELECT * FROM students");
-		try {
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM students");
 			while (rs.next()) {
 
 				StudentDto student = new StudentDto(rs.getString("name"), rs.getString("surnames"),
@@ -74,21 +74,23 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public void createStudent(StudentDto student) throws SQLException {
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call insert_student(?, ?, ?, ?, ?)}");
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
 
-		boolean isMan = true;
-		if (student.getSex().equals("Femenino")) {
-			isMan = false;
+			CallableStatement CS = conn.prepareCall("{call insert_student(?, ?, ?, ?, ?)}");
+			boolean isMan = true;
+			if (student.getSex().equals("Femenino")) {
+				isMan = false;
+			}
+
+			CS.setString(1, student.getName());
+			CS.setString(2, student.getSurname());
+			CS.setBoolean(3, isMan);
+			CS.setInt(4, Integer.valueOf(student.getMunicipality().getId()));
+			CS.setInt(5, Integer.valueOf(student.getGroup().getId()));
+
+			CS.executeUpdate();
+
 		}
-
-		CS.setString(1, student.getName());
-		CS.setString(2, student.getSurname());
-		CS.setBoolean(3, isMan);
-		CS.setInt(4, Integer.valueOf(student.getMunicipality().getId()));
-		CS.setInt(5, Integer.valueOf(student.getGroup().getId()));
-
-		CS.executeUpdate();
 
 	}
 
@@ -99,38 +101,38 @@ public class StudentServiceImpl implements StudentService {
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call update_student(?, ?, ?, ?, ?, ?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call update_student(?, ?, ?, ?, ?, ?)}");
+			boolean isMan = true;
+			if (student.getSex().equals("Femenino")) {
+				isMan = false;
+			}
+			CS.setInt(1, Integer.valueOf(student.getId()));
+			CS.setString(2, student.getName());
+			CS.setString(3, student.getSurname());
+			CS.setBoolean(4, isMan);
+			CS.setInt(5, Integer.valueOf(student.getMunicipality().getId()));
+			CS.setInt(6, Integer.valueOf(student.getGroup().getId()));
 
-		boolean isMan = true;
-		if (student.getSex().equals("Femenino")) {
-			isMan = false;
+			CS.executeUpdate();
 		}
-		CS.setInt(1, Integer.valueOf(student.getId()));
-		CS.setString(2, student.getName());
-		CS.setString(3, student.getSurname());
-		CS.setBoolean(4, isMan);
-		CS.setInt(5, Integer.valueOf(student.getMunicipality().getId()));
-		CS.setInt(6, Integer.valueOf(student.getGroup().getId()));
-
-		CS.executeUpdate();
-
 	}
 
 	@Override
 	public void deleteStudent(String id) throws SQLException {
-		try {
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
 			getStudentById(id);
+
+			CallableStatement CS = conn.prepareCall("{call delete_student(?)}");
+
+			CS.setInt(1, Integer.valueOf(id));
+
+			CS.executeUpdate();
+
 		} catch (NoSuchElementException e) {
 			throw e;
 		}
-
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call delete_student(?)}");
-
-		CS.setInt(1, Integer.valueOf(id));
-
-		CS.executeUpdate();
 
 	}
 

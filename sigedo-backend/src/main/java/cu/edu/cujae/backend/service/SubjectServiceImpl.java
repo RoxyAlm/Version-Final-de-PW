@@ -1,6 +1,7 @@
 package cu.edu.cujae.backend.service;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,23 +24,22 @@ public class SubjectServiceImpl implements SubjectService {
 	public List<SubjectDto> getSubjects() throws SQLException {
 
 		List<SubjectDto> subjects = new ArrayList<>();
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM subjects");
 
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement()
-				.executeQuery("SELECT * FROM subjects");
+			while (rs.next()) {
 
-		while (rs.next()) {
+				int id = rs.getInt(1);
+				String name = rs.getString(2);
+				int hours = rs.getInt(3);
+				int years = rs.getInt(4);
 
-			int id = rs.getInt(1);
-			String name = rs.getString(2);
-			int hours = rs.getInt(3);
-			int years = rs.getInt(4);
+				SubjectDto subject = new SubjectDto(name, hours, years, false);
 
-			SubjectDto subject = new SubjectDto(name, hours, years, false);
-
-			subject.setId(String.valueOf(id));
-			subjects.add(subject);
+				subject.setId(String.valueOf(id));
+				subjects.add(subject);
+			}
 		}
-
 		return subjects;
 	}
 
@@ -53,42 +53,43 @@ public class SubjectServiceImpl implements SubjectService {
 
 	@Override
 	public void createSubject(SubjectDto subject) throws SQLException {
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call insert_subject(?, ?, ?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call insert_subject(?, ?, ?)}");
+			CS.setString(1, subject.getNameSubject());
+			CS.setInt(2, subject.getHours());
+			CS.setInt(3, subject.getYear());
 
-		CS.setString(1, subject.getNameSubject());
-		CS.setInt(2, subject.getHours());
-		CS.setInt(3, subject.getYear());
-
-		CS.executeUpdate();
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
 	public void updateSubject(SubjectDto subject) throws NumberFormatException, SQLException {
 
 		getSubjectById(subject.getId());
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call update_subject(?, ?, ?, ?)}");
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection()
-				.prepareCall("{call update_subject(?, ?, ?, ?)}");
+			CS.setInt(1, Integer.valueOf(subject.getId()));
+			CS.setString(2, subject.getNameSubject());
+			CS.setInt(3, subject.getHours());
+			CS.setInt(4, subject.getYear());
 
-		CS.setInt(1, Integer.valueOf(subject.getId()));
-		CS.setString(2, subject.getNameSubject());
-		CS.setInt(3, subject.getHours());
-		CS.setInt(4, subject.getYear());
-
-		CS.executeUpdate();
+			CS.executeUpdate();
+		}
 	}
 
 	@Override
 	public void deleteSubject(String id) throws SQLException, NoSuchElementException {
 
 		getSubjectById(id);
+		try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+			CallableStatement CS = conn.prepareCall("{call delete_subject(?)}");
+			CS.setInt(1, Integer.valueOf(id));
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall("{call delete_subject(?)}");
-		CS.setInt(1, Integer.valueOf(id));
-
-		CS.executeUpdate();
+			CS.executeUpdate();
+		}
 	}
 
 }

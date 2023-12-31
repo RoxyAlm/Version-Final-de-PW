@@ -1,0 +1,71 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui" >
+    <p:dialog 
+        header="Evaluacion" 
+        widgetVar="manageEvaluationDialog"
+        showEffect="fade" 
+        modal="true"
+        responsive="true">
+
+        <div class="card">
+            <h:form>
+                <p:outputPanel id="manage-eval-content" class="ui-fluid" deferred="true">
+                   <p:outputPanel rendered="#{not empty manageEvaluationBean.selectedEval}">
+                    <div class="card">
+                        <p:panelGrid columns="4" layout="flex"
+                                     columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4"
+                                     contentStyleClass="ui-fluid">
+
+                            <p:outputLabel for="selectSubject" value="Asignatura:"/>
+                            <p:selectOneMenu id="selectSubject" required="true" value="#{manageEvaluationBean.selectedEval.subject}">
+                                <f:selectItem itemLabel="Seleccione una asignatura" itemValue=""/>
+                                <f:selectItem itemLabel="Programacion Web" itemValue="Programacion Web"/>
+                                <f:selectItem itemLabel="Inteligencia Artificial" itemValue="Inteligencia Artificial"/>
+                                <f:selectItem itemLabel="Introduccion a la Informatica" itemValue="Introduccion a la Informatica"/>
+                                <f:selectItem itemLabel="Historia de Cuba" itemValue="Historia de Cuba"/>
+                                <f:selectItem itemLabel="Calculo 1" itemValue="Calculo 1"/>
+                                <f:selectItem itemLabel="Filosofia y Sociedad" itemValue="Filosofia y Sociedad"/>
+                                <f:selectItem itemLabel="Matematicas Discretas" itemValue="Matematicas Discretas"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel for="selectStudent" value="Estudiante:"/>
+                            <p:selectOneMenu id="selectStudent" required="true" value="#{manageEvaluationBean.selectedEval.student}">
+                                <f:selectItem itemLabel="Seleccione un estudiante" itemValue=""/>
+                                <f:selectItem itemLabel="student1" itemValue="Paula Fernandez Cepeda"/>
+                                <f:selectItem itemLabel="student2" itemValue="Alejandro Molina Garcia"/>
+                                <f:selectItem itemLabel="student3" itemValue="Ernesto Hernandez Sanchez"/>
+                                <f:selectItem itemLabel="student4" itemValue="Celia Lopez Hernandez"/>
+                                <f:selectItem itemLabel="student5" itemValue="Roly Rodriguez Perez"/>
+                                <f:selectItem itemLabel="student6" itemValue="Sofia Perez Villalon"/>
+                                <f:selectItem itemLabel="student7" itemValue="Mario Duarte Bonne"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel for="@next">Nota:</p:outputLabel>
+                            <p:inputText id="note" required="true" value="#{manageEvaluationBean.selectedEval.note}" maxlength="1">
+                                <p:keyfilter mask="num"/>
+                            </p:inputText>
+                            <f:facet name="footer">
+                                <p:commandButton
+                                    value="Salvar"
+                                    icon="pi pi-check"
+                                    actionListener="#{manageEvaluationtBean.saveEvaluation}"
+                                    update="manage-student-content"
+                                    process="manage-student-content @this"/>
+                                <p:commandButton
+                                    value="Cancelar"
+                                    icon="pi pi-times"
+                                    onclick="PF('manageEvalDialog').hide()"
+                                    class="ui-button-secondary"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </div>
+                   </p:outputPanel>
+                </p:outputPanel>
+            </h:form>
+        </div>   
+    
+</p:dialog>
+
+</ui:composition>

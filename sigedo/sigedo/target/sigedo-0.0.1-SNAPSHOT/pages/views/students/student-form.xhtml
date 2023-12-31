@@ -1,0 +1,116 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <p:dialog
+    header="Estudiante"
+    showEffect="fade"
+    modal="true"
+    widgetVar="manageStudentDialog"
+    responsive="true"
+  >
+    <p:outputPanel id="manage-student-content" class="ui-fluid">
+      <p:outputPanel rendered="#{not empty manageStudentBean.selectedStudent}">
+        <p:panelGrid layout="grid" columns="2">
+          <h:panelGroup>
+            <div class="p-field">
+              <p:outputLabel for="@next">Nombres</p:outputLabel>
+              <p:inputText
+                id="name"
+                required="true"
+                value="#{manageStudentBean.selectedStudent.name}"
+              />
+              <p:message for="@previous"></p:message>
+            </div>
+            <div class="p-field">
+              <p:outputLabel for="@next">Apellidos</p:outputLabel>
+              <p:inputText
+                id="surname"
+                required="true"
+                value="#{manageStudentBean.selectedStudent.surname}"
+              />
+              <p:message for="@previous"></p:message>
+            </div>
+            <div class="p-field">
+              <p:outputLabel for="@next">Sexo</p:outputLabel>
+              <p:inputText
+                id="sex"
+                required="true"
+                value="#{manageStudentBean.selectedStudent.sex}"
+              />
+              <p:message for="@previous"></p:message>
+            </div>
+            <div class="p-field">
+              <p:outputLabel for="@next">No. Grupo</p:outputLabel>
+              <p:inputText
+                id="group"
+                required="true"
+                value="#{manageStudentBean.selectedStudent.group}"
+                maxlength="1"
+              >
+                <p:keyFilter mask="num" />
+              </p:inputText>
+              <p:message for="@previous"></p:message>
+            </div>
+            <div class="p-field">
+              <p:outputLabel for="@next">No. Año</p:outputLabel>
+              <p:inputText
+                id="year"
+                required="true"
+                value="#{manageStudentBean.selectedStudent.year}"
+                maxlength="1"
+              >
+                <p:keyFilter mask="num" />
+              </p:inputText>
+              <p:message for="@previous"></p:message>
+            </div>
+          </h:panelGroup>
+          <h:panelGroup>
+            <div class="p-field">
+              <p:outputLabel for="@next">Municipio</p:outputLabel>
+               <p:selectCheckboxMenu
+                id="multiple"
+                required="true"
+                value="#{manageStudentBean.municipalities}"
+                label="Seleccione"
+                style="min-width: 15rem"
+                multiple="false"
+                filter="true"
+                filterMatchMode="startsWith"
+                panelStyle="width: 30rem"
+                scrollHeight="250"
+              >
+                <f:selectItems
+                  value="#{manageStudentBean.selectedStudent.municipality}"
+                  var="municipality"
+                  itemLabel="#{municipality.name}"
+                  itemValue="#{municipality.id}"
+                />
+              </p:selectCheckboxMenu>
+              
+            </div>
+          </h:panelGroup>
+        </p:panelGrid>
+      </p:outputPanel>
+    </p:outputPanel>
+
+    <f:facet name="footer">
+      <p:commandButton
+        value="Salvar"
+        icon="pi pi-check"
+        actionListener="#{manageStudentBean.saveStudent}"
+        update="manage-student-content"
+        process="manage-student-content @this"
+      />
+      <p:commandButton
+        value="Cancelar"
+        icon="pi pi-times"
+        onclick="PF('manageStudentDialog').hide()"
+        class="ui-button-secondary"
+      />
+    </f:facet>
+  </p:dialog>
+</ui:composition>

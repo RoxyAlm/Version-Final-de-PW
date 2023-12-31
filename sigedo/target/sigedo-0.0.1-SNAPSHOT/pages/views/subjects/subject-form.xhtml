@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog header="Subject" showEffect="fade" modal="true" widgetVar="manageSubjectDialog" responsive="true">
+		<p:outputPanel id="manage-subject-content" class="ui-fluid">
+			<p:outputPanel rendered="#{not empty manageSubjectBean.selectedSubject}">
+				<p:panelGrid layout="grid" columns="2">
+					<h:panelGroup>
+						<div class="p-field">
+							<p:outputLabel for="@next">Nombre</p:outputLabel>
+							<p:inputText id="name" required="true"
+								value="#{manageSubjectBean.selectedSubject.nameSubject}" />
+							<p:message for="@previous"></p:message>
+						</div>
+
+						<div class="p-field">
+							<p:outputLabel for="@next">Cantidad de horas</p:outputLabel>
+							<p:spinner id="hours" value="#{manageSubjectBean.selectedSubject.hours}" min="1" max="100"
+								stepFactor="5" round="true" />
+							<p:message for="@previous"></p:message>
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="@next" value="Año académico" />
+							<p:spinner id="year" value="#{manageSubjectBean.selectedSubject.year}" min="1" max="5" />
+							<p:message for="@previous"></p:message>
+						</div>
+					</h:panelGroup>
+				</p:panelGrid>
+			</p:outputPanel>
+		</p:outputPanel>
+
+		<f:facet name="footer">
+			<p:commandButton 
+				value="Salvar" 
+				icon="pi pi-check" 
+				actionListener="#{manageSubjectBean.saveSubject}"
+				update="manage-subject-content" 
+				process="manage-subject-content @this" 
+			/>
+			<p:commandButton 
+				value="Cancelar" 
+				icon="pi pi-times" 
+				onclick="PF('manageSubjectDialog').hide()"
+				class="ui-button-secondary"
+			/>
+		</f:facet>
+	</p:dialog>
+</ui:composition>

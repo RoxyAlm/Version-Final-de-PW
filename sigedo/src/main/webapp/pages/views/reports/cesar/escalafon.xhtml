@@ -1,0 +1,141 @@
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <ui:composition template="/pages/template/layout.xhtml">
+    <ui:define name="title">Escalafón</ui:define>
+    <ui:define name="layout">
+      <h:form id="form">
+        <div class="card crud-demo">
+          <p:toolbar>
+            <p:toolbarGroup>
+              <p:outputLabel for="@next" value="Grupo:" />
+              <p:selectOneMenu id="option" exportable="false">
+                <f:selectItem itemLabel="Todos" itemValue="" />
+                <f:selectItems
+                  value="#{manageEscalafonBean.groups}"
+                  var="group"
+                  itemLabel="#{group}"
+                  itemValue="#{group.id}"
+                />
+              </p:selectOneMenu>
+            </p:toolbarGroup>
+            <p:toolbarGroup align="right">
+              <!-- Este es un button que tiene como objetivo exportar el contenido de la tabla que apunta a propiedad target
+					         del componente dataExporter. En este caso dt-users es el identificador del componente datatable -->
+              <p:commandButton
+                value="Export"
+                icon="pi pi-upload"
+                styleClass="ui-button-help"
+                ajax="false"
+              >
+                <p:dataExporter
+                  type="pdf"
+                  target="dt-escalafon"
+                  fileName="escalafon"
+                />
+              </p:commandButton>
+            </p:toolbarGroup>
+          </p:toolbar>
+          <p:dataTable
+            id="dt-escalafon"
+            widgetVar="dtEscalafon"
+            var="escalafon"
+            value="#{manageEscalafonBean.escalafonList}"
+            reflow="true"
+            paginator="true"
+            rows="10"
+            paginatorPosition="bottom"
+          >
+            <f:facet name="header">
+              <div class="products-table-header">
+                <span style="font-weight: bold">Estudiante</span>
+                <span class="filter-container ui-input-icon-left">
+                  <i class="pi pi-search"></i>
+                  <p:inputText
+                    id="globalFilter"
+                    onkeyup="PF('dtEscalafon').filter()"
+                    placeholder="Buscar"
+                  />
+                </span>
+              </div>
+            </f:facet>
+            <!-- Posicion en el escalafon anual -->
+            <p:column
+              headerText="Posición. Anual"
+              filterBy="#{escalafon.numAnual}"
+              filterMatchMode="contains"
+            >
+              <h:outputText value="#{escalafon.numAnual}" />
+            </p:column>
+            <p:column
+              headerText="Posición. Grupal"
+              sortBy="#{escalafon.numGrupal}"
+              filterBy="#{escalafon.numGrupal}"
+            >
+              <h:outputText value="#{escalafon.numGrupal}" />
+            </p:column>
+            <p:column
+              headerText="Nombres"
+              sortBy="#{escalafon.names}"
+              filterBy="#{escalafon.names}"
+            >
+              <h:outputText value="#{escalafon.names}" />
+            </p:column>
+            <p:column
+              headerText="Apellidos"
+              sortBy="#{escalafon.surnames}"
+              filterBy="#{escalafon.surnames}"
+            >
+              <h:outputText value="#{escalafon.surnames}" />
+            </p:column>
+            <p:column
+              headerText="Sexo"
+              sortBy="#{escalafon.sexo}"
+              filterBy="#{escalafon.sexo}"
+            >
+              <h:outputText value="#{escalafon.sexo}" />
+            </p:column>
+            <p:column
+              headerText="Municipio Residencia"
+              sortBy="#{escalafon.municipio}"
+              filterBy="#{escalafon.municipio}"
+            >
+              <h:outputText value="#{escalafon.municipio}" />
+            </p:column>
+            <p:column
+              headerText="Promedio"
+              sortBy="#{escalafon.promedio}"
+              filterBy="#{escalafon.promedio}"
+            >
+              <h:outputText value="#{escalafon.promedio}" />
+            </p:column>
+          </p:dataTable>
+
+          <!-- ui:include es una etiqueta de facelet que permite incluir pages y de esta forma el code no se carga tanto -->
+          <!-- <ui:include src="municipality-form.xhtml"></ui:include> -->
+
+          <!-- Este comoponente se utiliza mucho para el caso de los eliminar, que es donde casi siempre se necesita confirmation,
+				su uso es bien sencillo, cada confirmDialog va atado a un p:confirm que es el que se definie dentro del button -->
+          <!-- <p:confirmDialog global="true" showEffect="fade" width="300">
+            <p:commandButton
+              value="Si"
+              type="button"
+              styleClass="ui-confirmdialog-yes"
+              icon="pi pi-check"
+            />
+            <p:commandButton
+              value="No"
+              type="button"
+              styleClass="ui-confirmdialog-no ui-button-secondary"
+              icon="pi pi-times"
+            />
+          </p:confirmDialog> -->
+        </div>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>

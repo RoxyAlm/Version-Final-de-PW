@@ -17,7 +17,6 @@ import cu.edu.cujae.pweb.utils.JsfUtils;
 @Component
 @ManagedBean
 @ViewScoped
-
 public class ManageEvaluationBean {
 
     private EvaluationDto evalDto;

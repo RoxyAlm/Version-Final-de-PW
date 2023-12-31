@@ -1,0 +1,112 @@
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <ui:composition template="/pages/template/layout.xhtml">
+    <ui:define name="title">Listado de promedios finales</ui:define>
+    <ui:define name="layout">
+      <h:form id="form">
+        <div class="card crud-demo">
+          <p:toolbar>
+            <p:toolbarGroup></p:toolbarGroup>
+            <p:toolbarGroup align="right">
+              <!-- Este es un button que tiene como objetivo exportar el contenido de la tabla que apunta a propiedad target
+					         del componente dataExporter. En este caso dt-users es el identificador del componente datatable -->
+              <p:commandButton
+                value="Export"
+                icon="pi pi-upload"
+                styleClass="ui-button-help"
+                ajax="false"
+              >
+                <p:dataExporter
+                  type="pdf"
+                  target="dt-promedios"
+                  fileName="promedios"
+                />
+              </p:commandButton>
+            </p:toolbarGroup>
+          </p:toolbar>
+          <p:dataTable
+            id="dt-promedios"
+            widgetVar="dtPromedios"
+            var="listadoProm"
+            value="#{manageListPromFinalesBean.listado}"
+            reflow="true"
+            paginator="true"
+            rows="10"
+            paginatorPosition="bottom"
+          >
+            <f:facet name="header">
+              <div class="products-table-header">
+                <span style="font-weight: bold">Estudiante</span>
+                <span class="filter-container ui-input-icon-left">
+                  <i class="pi pi-search"></i>
+                  <p:inputText
+                    id="globalFilter"
+                    onkeyup="PF('dtListProm').filter()"
+                    placeholder="Buscar"
+                  />
+                </span>
+              </div>
+            </f:facet>
+            <!-- Nombres -->
+            <p:column
+              headerText="Nombres"
+              sortBy="#{listadoProm.names}"
+              filterBy="#{listadoProm.names}"
+            >
+              <h:outputText value="#{listadoProm.names}" />
+            </p:column>
+            <!-- Apellidos -->
+            <p:column
+              headerText="Apellidos"
+              sortBy="#{listadoProm.surnames}"
+              filterBy="#{listadoProm.surnames}"
+            >
+              <h:outputText value="#{listadoProm.surnames}" />
+            </p:column>
+            <!-- Edad -->
+            <p:column
+              headerText="Edad"
+              sortBy="#{listadoProm.edad}"
+              filterBy="#{listadoProm.edad}"
+            >
+              <h:outputText value="#{listadoProm.edad}" />
+            </p:column>
+            <!-- Promedio -->
+            <p:column
+              headerText="Promedio"
+              sortBy="#{listadoProm.promedio}"
+              filterBy="#{listadoProm.promedio}"
+            >
+              <h:outputText value="#{listadoProm.promedio}" />
+            </p:column>
+          </p:dataTable>
+
+          <!-- ui:include es una etiqueta de facelet que permite incluir pages y de esta forma el code no se carga tanto -->
+          <!-- <ui:include src="municipality-form.xhtml"></ui:include> -->
+
+          <!-- Este comoponente se utiliza mucho para el caso de los eliminar, que es donde casi siempre se necesita confirmation,
+				su uso es bien sencillo, cada confirmDialog va atado a un p:confirm que es el que se definie dentro del button -->
+          <!-- <p:confirmDialog global="true" showEffect="fade" width="300">
+            <p:commandButton
+              value="Si"
+              type="button"
+              styleClass="ui-confirmdialog-yes"
+              icon="pi pi-check"
+            />
+            <p:commandButton
+              value="No"
+              type="button"
+              styleClass="ui-confirmdialog-no ui-button-secondary"
+              icon="pi pi-times"
+            />
+          </p:confirmDialog> -->
+        </div>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>
