@@ -5,10 +5,15 @@
   xmlns:ui="http://java.sun.com/jsf/facelets"
   xmlns:p="http://primefaces.org/ui"  
 > 
-  <p:card style="width: auto">
-    <f:facet name="title"> Introduzca los datos del grupo en el siguiente formulario:</f:facet>
+  <p:dialog
+    header="Grupo"
+    showEffect="fade"
+    modal="true"
+    widgetVar="manageGroupDialog"
+    responsive="true"
+  >
     <p:outputPanel id="manage-group-content" class="ui-fluid">   
-     <p:outputPanel rendered="#{not empty manageGroupBean.selectedGroup}">
+     <p:outputPanel rendered="#{not empty manageGroupBean.selectedgroup}">
         <p:panelGrid columns="2" layout="grid">
           <h:panelGroup>
             <div class="p-field">
@@ -17,7 +22,7 @@
                 id="id_group"
                 required="true"
                 maxlength="1"
-                value="#{manageGroupBean.selectedGroup.num_group}"  
+                value="#{manageGroupBean.selectedgroup.num_group}"  
               >
                 <p:keyFilter mask="int" />
               </p:inputText>
@@ -29,7 +34,7 @@
           <h:panelGroup>
             <div class="p-field">
               <p:outputLabel for="@next">Número de Año</p:outputLabel>
-              <p:selectOneMenu id="combo_annos" value="#{manageGroupBean.selectedGroup.year}" required="true" dir="rtl"  >
+              <p:selectOneMenu id="combo_annos" value="#{manageGroupBean.selectedgroup.year}" required="true" dir="rtl"  >
 			         <f:selectItem itemLabel="Primero" itemValue="1"/>
 			         <f:selectItem itemLabel="Segundo" itemValue="2"/>
 			         <f:selectItem itemLabel="Tercero" itemValue="3"/>
@@ -57,6 +62,6 @@
         icon="pi pi-times"
         class="ui-button-secondary"
       />
-    </f:facet> 
-  </p:card>
+    </f:facet>
+  </p:dialog>
 </ui:composition>
